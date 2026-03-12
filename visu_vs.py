@@ -4,7 +4,7 @@ import plotly.express as px
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
-import seaborn as sns
+
 
 # Load the dataset
 df = pd.read_csv('shopping_trends_updated.csv')
@@ -37,75 +37,79 @@ df['Age Group'] = pd.cut(df['Age'], bins=bins, labels=labels, right=False)
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
-# App layout
-app.layout = html.Div([
-    html.Div([
-        html.H1("Shopping Trends Dashboard", style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '34px', 'padding': '20px 0'}),
-        html.P(
-            "Explore and analyze customer review ratings, purchase amounts, and trends across different states, seasons, and demographics. Use the filters to customize the visualizations and gain insights into shopping behaviors.",
-            style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '20px', 'maxWidth': '800px', 'margin': '0 auto', 'padding': '10px 0'}
-        )
-    ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)'}),
-    html.Div([
-        html.H2("Filter Options", style={'textAlign': 'left', 'fontFamily': 'Helvetica', 'fontSize': '28px', 'padding': '10px 0'}),
-        html.Div([
-            html.Div([
-                html.Label("Seasons", style={'fontFamily': 'Helvetica', 'fontSize': '20px'}),
-                dcc.Checklist(
-                    id='season-filter',
-                    options=[{'label': season, 'value': season} for season in df['Season'].unique()],
-                    value=list(df['Season'].unique()),  # Default to show all seasons
-                    inline=True,
-                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
-                ),
-            ], style={'flex': '1', 'padding': '10px'}),
-            html.Div([
-                html.Label("State", style={'fontFamily': 'Helvetica', 'fontSize': '20px'}),
-                dcc.Dropdown(
-                    id='state-filter',
-                    options=[{'label': state, 'value': abbrev} for state, abbrev in state_abbrev.items()],
-                    placeholder="Select a state",
-                    clearable=True,
-                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
-                ),
-            ], style={'flex': '1', 'padding': '10px'}),
-        ], style={'display': 'flex', 'flexWrap': 'wrap', 'margin': '0 -10px'})
-    ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'margin': '20px 0'}),
-    html.Div([
-        html.H2("Visualizations", style={'textAlign': 'left', 'fontFamily': 'Helvetica', 'fontSize': '28px', 'padding': '10px 0'}),
-        html.Div([
-            html.P("This map shows the average review ratings across different states for the selected seasons.",
-                   style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
-            dcc.Graph(id='choropleth-map', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
-        ], style={'padding': '10px'}),
-        html.Div([
-            html.P("This bar chart displays the average review ratings of different items purchased for the selected seasons.",
-                   style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
-            dcc.Graph(id='bar-chart', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
-        ], style={'padding': '10px'}),
-        html.Div([
-            html.P("This bubble plot aggregates shopping trends, showing review ratings, purchase amounts, and previous purchases for the selected seasons. The bubble size represents the total number of previous purchases.",
-                   style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
-            dcc.Graph(id='bubble-plot', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
-        ], style={'padding': '10px'}),
-        html.Div([
-            html.P("This line plot shows the average review ratings by age group and gender for the selected seasons.",
-                   style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
-            dcc.Checklist(
-                id='gender-overall-checklist',
-                options=[
-                    {'label': 'Male', 'value': 'Male'},
-                    {'label': 'Female', 'value': 'Female'},
-                    {'label': 'Overall', 'value': 'Overall'}
-                ],
-                value=['Male', 'Female', 'Overall'],
-                inline=True,
-                style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
-            ),
-            dcc.Graph(id='scatter-plot', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
-        ], style={'padding': '10px'})
-    ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'margin': '20px 0'})
-])
+
+############## Stacked App layout
+# app.layout = html.Div([
+#     html.Div([
+#         html.H1("Shopping Trends Dashboard", style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '34px', 'padding': '20px 0'}),
+#         html.P(
+#             "Explore and analyze customer review ratings, purchase amounts, and trends across different states, seasons, and demographics. Use the filters to customize the visualizations and gain insights into shopping behaviors.",
+#             style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '20px', 'maxWidth': '800px', 'margin': '0 auto', 'padding': '10px 0'}
+#         )
+#     ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)'}),
+#     html.Div([
+#         html.H2("Filter Options", style={'textAlign': 'left', 'fontFamily': 'Helvetica', 'fontSize': '28px', 'padding': '10px 0'}),
+#         html.Div([
+#             html.Div([
+#                 html.Label("Seasons", style={'fontFamily': 'Helvetica', 'fontSize': '20px'}),
+#                 dcc.Checklist(
+#                     id='season-filter',
+#                     options=[{'label': season, 'value': season} for season in df['Season'].unique()],
+#                     value=list(df['Season'].unique()),  # Default to show all seasons
+#                     inline=True,
+#                     style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
+#                 ),
+#             ], style={'flex': '1', 'padding': '10px'}),
+#             html.Div([
+#                 html.Label("State", style={'fontFamily': 'Helvetica', 'fontSize': '20px'}),
+#                 dcc.Dropdown(
+#                     id='state-filter',
+#                     options=[{'label': state, 'value': abbrev} for state, abbrev in state_abbrev.items()],
+#                     placeholder="Select a state",
+#                     clearable=True,
+#                     style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
+#                 ),
+#             ], style={'flex': '1', 'padding': '10px'}),
+#         ], style={'display': 'flex', 'flexWrap': 'wrap', 'margin': '0 -10px'})
+#     ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'margin': '20px 0'}),
+#     html.Div([
+#         html.H2("Visualizations", style={'textAlign': 'left', 'fontFamily': 'Helvetica', 'fontSize': '28px', 'padding': '10px 0'}),
+#         html.Div([
+#             html.P("This map shows the average review ratings across different states for the selected seasons.",
+#                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
+#             dcc.Graph(id='choropleth-map', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
+#         ], style={'padding': '10px'}),
+#         html.Div([
+#             html.P("This bar chart displays the average review ratings of different items purchased for the selected seasons.",
+#                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
+#             dcc.Graph(id='bar-chart', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
+#         ], style={'padding': '10px'}),
+#         html.Div([
+#             html.P("This bubble plot aggregates shopping trends, showing review ratings, purchase amounts, and previous purchases for the selected seasons. The bubble size represents the total number of previous purchases.",
+#                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
+#             dcc.Graph(id='bubble-plot', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
+#         ], style={'padding': '10px'}),
+#         html.Div([
+#             html.P("This line plot shows the average review ratings by age group and gender for the selected seasons.",
+#                    style={'fontFamily': 'Helvetica', 'fontSize': '18px'}),
+#             dcc.Checklist(
+#                 id='gender-overall-checklist',
+#                 options=[
+#                     {'label': 'Male', 'value': 'Male'},
+#                     {'label': 'Female', 'value': 'Female'},
+#                     {'label': 'Overall', 'value': 'Overall'}
+#                 ],
+#                 value=['Male', 'Female', 'Overall'],
+#                 inline=True,
+#                 style={'fontFamily': 'Helvetica', 'fontSize': '18px'}
+#             ),
+#             dcc.Graph(id='scatter-plot', style={'width': '100%', 'height': '500px', 'marginBottom': '40px'}),
+#         ], style={'padding': '10px'})
+#     ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'margin': '20px 0'})
+# ])
+
+
+
 
 # Callback to update the choropleth map
 @app.callback(
@@ -149,6 +153,84 @@ def update_map(selected_seasons, selected_state):
     )
 
     return fig
+
+
+app.layout = html.Div([
+    # --- Header Section ---
+    html.Div([
+        html.H1("Shopping Trends Dashboard", style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '34px', 'padding': '10px 0'}),
+        html.P(
+            "Explore and analyze customer review ratings, purchase amounts, and trends across different states, seasons, and demographics.",
+            style={'textAlign': 'center', 'fontFamily': 'Helvetica', 'fontSize': '18px', 'maxWidth': '800px', 'margin': '0 auto'}
+        )
+    ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'marginBottom': '20px'}),
+
+    # --- Filter Section ---
+    html.Div([
+        html.H2("Filter Options", style={'fontFamily': 'Helvetica', 'fontSize': '24px', 'marginBottom': '10px'}),
+        html.Div([
+            html.Div([
+                html.Label("Seasons", style={'fontFamily': 'Helvetica', 'fontSize': '18px', 'display': 'block'}),
+                dcc.Checklist(
+                    id='season-filter',
+                    options=[{'label': season, 'value': season} for season in df['Season'].unique()],
+                    value=list(df['Season'].unique()),
+                    inline=True,
+                    style={'fontFamily': 'Helvetica', 'fontSize': '16px'}
+                ),
+            ], style={'flex': '1', 'padding': '10px'}),
+            html.Div([
+                html.Label("State", style={'fontFamily': 'Helvetica', 'fontSize': '18px', 'display': 'block'}),
+                dcc.Dropdown(
+                    id='state-filter',
+                    options=[{'label': state, 'value': abbrev} for state, abbrev in state_abbrev.items()],
+                    placeholder="Select a state",
+                    clearable=True,
+                    style={'fontFamily': 'Helvetica', 'fontSize': '16px'}
+                ),
+            ], style={'flex': '1', 'padding': '10px'}),
+        ], style={'display': 'flex', 'flexDirection': 'row'})
+    ], style={'backgroundColor': '#f9f9f9', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)', 'marginBottom': '20px'}),
+
+    # --- Visualizations Grid Section (The 2x2 Grid) ---
+    html.Div([
+        html.H2("Visualizations", style={'fontFamily': 'Helvetica', 'fontSize': '24px', 'padding': '10px 0'}),
+        
+        # ROW 1 (Map and Bar Chart)
+        html.Div([
+            html.Div([
+                html.P("Average Review Ratings by State", style={'fontFamily': 'Helvetica', 'fontWeight': 'bold', 'textAlign': 'center'}),
+                dcc.Graph(id='choropleth-map', style={'height': '400px'}),
+            ], style={'width': '49%', 'display': 'inline-block', 'padding': '10px', 'backgroundColor': 'white', 'borderRadius': '10px', 'boxShadow': '2px 2px 5px rgba(0,0,0,0.05)'}),
+            
+            html.Div([
+                html.P("Ratings by Item Purchased", style={'fontFamily': 'Helvetica', 'fontWeight': 'bold', 'textAlign': 'center'}),
+                dcc.Graph(id='bar-chart', style={'height': '400px'}),
+            ], style={'width': '49%', 'display': 'inline-block', 'padding': '10px', 'backgroundColor': 'white', 'borderRadius': '10px', 'boxShadow': '2px 2px 5px rgba(0,0,0,0.05)'}),
+        ], style={'display': 'flex', 'justifyContent': 'space-between', 'marginBottom': '20px'}),
+
+        # ROW 2 (Bubble Plot and Scatter Plot)
+        html.Div([
+            html.Div([
+                html.P("Aggregated Shopping Trends", style={'fontFamily': 'Helvetica', 'fontWeight': 'bold', 'textAlign': 'center'}),
+                dcc.Graph(id='bubble-plot', style={'height': '400px'}),
+            ], style={'width': '49%', 'display': 'inline-block', 'padding': '10px', 'backgroundColor': 'white', 'borderRadius': '10px', 'boxShadow': '2px 2px 5px rgba(0,0,0,0.05)'}),
+            
+            html.Div([
+                html.P("Ratings by Age Group & Gender", style={'fontFamily': 'Helvetica', 'fontWeight': 'bold', 'textAlign': 'center'}),
+                dcc.Checklist(
+                    id='gender-overall-checklist',
+                    options=[{'label': g, 'value': g} for g in ['Male', 'Female', 'Overall']],
+                    value=['Male', 'Female', 'Overall'],
+                    inline=True,
+                    style={'textAlign': 'center', 'marginBottom': '5px'}
+                ),
+                dcc.Graph(id='scatter-plot', style={'height': '365px'}),
+            ], style={'width': '49%', 'display': 'inline-block', 'padding': '10px', 'backgroundColor': 'white', 'borderRadius': '10px', 'boxShadow': '2px 2px 5px rgba(0,0,0,0.05)'}),
+        ], style={'display': 'flex', 'justifyContent': 'space-between'}),
+
+    ], style={'backgroundColor': '#f1f1f1', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 15px rgba(0, 0, 0, 0.1)'})
+], style={'padding': '20px', 'maxWidth': '1400px', 'margin': '0 auto'})
 
 # Callback to update the bar chart
 @app.callback(
@@ -300,5 +382,7 @@ def update_scatter_plot(selected_overall_genders, selected_seasons, selected_sta
 
     return fig
 
+
+server = app.server
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8050)
+    app.run_server(debug=True)
