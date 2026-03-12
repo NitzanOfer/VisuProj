@@ -5,7 +5,7 @@
 
 > **A visual deep-dive into consumer habits, regional trends, and retail data storytelling.**
 
-
+![Dashboard Preview](preview.png)
 ---
 
 ## 📌 What is this?
