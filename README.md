@@ -1,4 +1,3 @@
-
 ---
 
 # 🛍️ Shopping Trends Interactive Dashboard
@@ -6,6 +5,7 @@
 > **A visual deep-dive into consumer habits, regional trends, and retail data storytelling.**
 
 ![Dashboard Preview](preview.png)
+
 ---
 
 ## 📌 What is this?
@@ -37,6 +37,15 @@ I used **Python** as the engine and **Plotly Dash** to build the interface.
 2. **Top Items Bar Chart:** See exactly what's trending in each category.
 3. **Shopping Trends Bubble Plot:** A 3D-style look at price vs. rating.
 4. **Age & Gender Line Plot:** Tracking satisfaction across different generations.
+
+---
+
+## 🚀 How to Run It Locally
+
+You can easily run this dashboard right on your own computer:
+1. Clone this repository and make sure you have the required libraries installed (`dash`, `pandas`, `plotly`).
+2. Run `python visu_vs.py` in your terminal.
+3. Open your web browser and navigate to `http://127.0.0.1:8050/`.
 
 ---
 
