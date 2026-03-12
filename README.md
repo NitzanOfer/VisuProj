@@ -1,4 +1,4 @@
----
+
 
 # 🛍️ Shopping Trends Interactive Dashboard
 
